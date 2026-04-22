@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>LigaPro AI 2026 - Experto Total</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial; background: #121212; display: flex; justify-content: center; padding: 20px; }
+        #chat-container { width: 450px; height: 600px; background: #fff; border-radius: 15px; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+        #header { background: #ce1126; color: white; padding: 15px; text-align: center; font-weight: bold; border-bottom: 5px solid #fcd116; }
+        #messages { flex: 1; padding: 15px; overflow-y: auto; background: #f0f2f5; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 12px; border-radius: 15px; font-size: 14px; line-height: 1.5; max-width: 85%; }
+        .bot { background: #e3f2fd; color: #0747a1; align-self: flex-start; border-bottom-left-radius: 2px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+        .user { background: #fff9c4; color: #333; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .input-area { display: flex; padding: 15px; background: white; border-top: 1px solid #ddd; }
+        input { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; }
+        input:focus { border-color: #ce1126; }
+        button { margin-left: 10px; padding: 0 20px; background: #003366; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="header">⚽ LIGAPRO TOTAL 2026</div>
+    <div id="messages">
+        <div class="msg bot">¡Habla! Soy tu analista de la LigaPro. <br>Pregúntame por cualquier equipo: Aucas, LDU, BSC, Cuenca, IDV... ¡el que sea!</div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ej: ¿Cuándo juega Aucas?" autocomplete="off">
+        <button id="sendBtn">Enviar</button>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        const input = document.getElementById('userInput');
+        const button = document.getElementById('sendBtn');
+        const display = document.getElementById('messages');
+
+        // BASE DE DATOS MAESTRA - LIGAPRO 2026
+        const baseDeDatos = [
+            { equipos: ["aucas", "papa aucas", "orientales"], r: "El Aucas juega HOY miércoles 22 de abril contra LDU Quito en el Estadio Rodrigo Paz a las 20:30." },
+            { equipos: ["barcelona", "bsc", "idolo", "toreros"], r: "Barcelona SC juega HOY miércoles 22 de abril contra Mushuc Runa a las 18:00 en el Monumental." },
+            { equipos: ["ldu", "liga de quito", "albos", "u"], r: "LDU Quito tiene partidazo HOY 22 de abril contra Aucas a las 20:30 en Casa Blanca." },
+            { equipos: ["independiente", "idv", "del valle"], r: "Independiente del Valle juega HOY 22 de abril de visita contra el Delfín a las 13:00 en el Jocay." },
+            { equipos: ["emelec", "bombillo", "azules"], r: "Emelec viene de ganarle 1-0 al Técnico Universitario. Su próximo partido es el Clásico contra LDU el sábado 25 a las 22:00." },
+            { equipos: ["cuenca", "deportivo cuenca", "morlacos"], r: "El Expreso Austral (Dep. Cuenca) juega HOY 22 de abril contra Orense a las 15:30 en el Alejandro Serrano Aguilar." },
+            { equipos: ["orense", "machala"], r: "Orense juega HOY 22 de abril contra el Cuenca (15:30). Además, el domingo 26 recibe a Barcelona SC." },
+            { equipos: ["mushuc runa", "ponchito"], r: "El Mushuc Runa visita HOY 22 de abril a Barcelona SC en el Monumental a las 18:00." },
+            { equipos: ["delfin", "cetaceo"], r: "Delfín recibe HOY 22 de abril a Independiente del Valle en Manta a las 13:00." },
+            { equipos: ["catolica", "trencito azul", "chatolei"], r: "La Chatoleí juega mañana jueves 23 de abril contra Macará a las 19:00 en el Atahualpa." },
+            { equipos: ["el nacional", "puros criollos", "nacho"], r: "El Nacional juega este viernes 24 de abril contra Imbabura a las 19:00." },
+            { equipos: ["macara", "ambato"], r: "Macará visita a la Univ. Católica mañana jueves 23 de abril a las 19:00." }
+        ];
+
+        function responder() {
+            const userText = input.value.trim().toLowerCase();
+            if (userText === "") return;
+
+            // Mostrar mensaje de usuario
+            const uDiv = document.createElement('div');
+            uDiv.className = "msg user";
+            uDiv.innerText = input.value;
+            display.appendChild(uDiv);
+            input.value = "";
+
+            setTimeout(() => {
+                const bDiv = document.createElement('div');
+                bDiv.className = "msg bot";
+                
+                let respuesta = "Chuta, no encuentro ese equipo en la Fecha 10. ¿Seguro que se escribe así? Prueba con el nombre solo, ej: 'Aucas'.";
+
+                // BÚSQUEDA INTELIGENTE: Recorre la base de datos buscando coincidencias
+                for (let item of baseDeDatos) {
+                    // Si alguna de las palabras clave del equipo está en lo que escribió el usuario
+                    if (item.equipos.some(keyword => userText.includes(keyword))) {
+                        respuesta = item.r;
+                        break; // Para en la primera coincidencia encontrada
+                    }
+                }
+
+                // Caso especial para "hoy"
+                if (userText.includes("hoy") && respuesta.includes("no encuentro")) {
+                    respuesta = "Cartelera HOY 22 de abril:\n- Delfín vs IDV (13:00)\n- Cuenca vs Orense (15:30)\n- BSC vs Mushuc Runa (18:00)\n- LDU vs Aucas (20:30)";
+                }
+
+                bDiv.innerText = respuesta;
+                display.appendChild(bDiv);
+                display.scrollTop = display.scrollHeight;
+            }, 500);
+
+            display.scrollTop = display.scrollHeight;
+        }
+
+        button.onclick = responder;
+        input.onkeypress = (e) => { if(e.key === 'Enter') responder(); };
+    };
+</script>
+
+</body>
+</html>
